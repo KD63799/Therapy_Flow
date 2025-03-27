@@ -54,7 +54,6 @@ object AppModule {
         }
     }
 
-    // Configure OkHttpClient avec les Interceptors
     @Singleton
     @Provides
     fun provideOkHttpClient(
@@ -67,14 +66,12 @@ object AppModule {
             .build()
     }
 
-    // Configure Moshi
     @Singleton
     @Provides
     fun provideMoshi(): Moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
 
-    // Configure Retrofit
     @Singleton
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
@@ -85,14 +82,12 @@ object AppModule {
             .build()
     }
 
-    // Fournit l'instance de l'API
     @Singleton
     @Provides
     fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 
-    // Fournit l'accès au sharedPreferences
     @Singleton
     @Provides
     fun provideSharedPref(@ApplicationContext context: Context): SharedPreferences =

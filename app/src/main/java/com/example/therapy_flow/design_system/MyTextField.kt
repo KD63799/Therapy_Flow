@@ -33,7 +33,6 @@ fun MyTextField(
         placeholder = { Text(text = hint, color = hintColor) },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         modifier = modifier,
-        // Utilisation des couleurs par défaut de Material3
         colors = TextFieldDefaults.colors(),
         leadingIcon = if (leadingIcon != null) {
             {

@@ -16,16 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.squareup.moshi.Json
+import com.example.therapy_flow.utils.Patient
 
-data class Patient(
-    val id: String,
-    val firstName: String,
-    val lastName: String,
-    val email: String,
-    val birthdate: String, // au format ISO (ex: "yyyy-MM-dd")
-    val phone: String
-)
 
 @Composable
 fun PatientItem(
@@ -40,24 +32,30 @@ fun PatientItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text("${patient.firstName} ${patient.lastName}", style = MaterialTheme.typography.bodyLarge)
-            Text(patient.email, style = MaterialTheme.typography.bodyMedium)
-            Text("Birthdate: ${patient.birthdate}", style = MaterialTheme.typography.bodySmall)
-            Text("Phone: ${patient.phone}", style = MaterialTheme.typography.bodySmall)
+            Text("${patient.firstName} ${patient.lastName}",
+                style = MaterialTheme.typography.bodyLarge)
+            Text(patient.email,
+                style = MaterialTheme.typography.bodyMedium)
+            Text("Birthdate: ${patient.birthdate}",
+                style = MaterialTheme.typography.bodySmall)
+            Text("Phone: ${patient.phone}",
+                style = MaterialTheme.typography.bodySmall)
         }
         Icon(
             imageVector = Icons.Outlined.Edit,
             contentDescription = "Edit Patient",
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
-                .size(24.dp)
+                .size(36.dp)
                 .clickable { onEdit() }
                 .padding(4.dp)
         )
         Icon(
             imageVector = Icons.Outlined.Delete,
             contentDescription = "Delete Patient",
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
-                .size(24.dp)
+                .size(36.dp)
                 .clickable { onDelete() }
                 .padding(4.dp)
         )

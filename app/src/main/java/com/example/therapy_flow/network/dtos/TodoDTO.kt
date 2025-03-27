@@ -12,7 +12,7 @@ data class TodoDTO(
     @Json(name = "description")
     val description: String?,
     @Json(name = "status")
-    val status: String,  // 'PENDING', 'DONE', 'OVERDUE'
+    val status: String,
     @Json(name = "therapist_id")
     val therapistId: String,
     @Json(name = "created_at")

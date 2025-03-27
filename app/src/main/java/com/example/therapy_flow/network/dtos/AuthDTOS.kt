@@ -22,8 +22,3 @@ data class RegisterRequestDTO(
     @Json(name = "password")
     val password: String
 )
-
-data class AuthTokenDTO(
-    @Json(name = "access_token")
-    val accessToken: String
-)

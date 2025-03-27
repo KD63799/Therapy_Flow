@@ -9,10 +9,10 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 import com.example.therapy_flow.network.dtos.*
+import retrofit2.http.PATCH
 
 interface ApiService {
 
-    // Authentification
     @POST(ApiRoutes.LOGIN)
     suspend fun login(
         @Query("grant_type") grantType: String = "password",
@@ -24,49 +24,38 @@ interface ApiService {
         @Body registerRequest: RegisterRequestDTO
     ): Response<TherapistDTO>?
 
-    // Patients
-    @GET(ApiRoutes.PATIENTS)
-    suspend fun getPatients(@Query("therapist_id") therapistId: String): Response<List<PatientDTO>>?
+    @GET(ApiRoutes.PATIENT)
+    suspend fun getPatients(@Query("therapist_id") filter: String): Response<List<PatientDTO>>?
 
-    @GET(ApiRoutes.PATIENT_DETAIL)
-    suspend fun getPatient(@Path("uid") uid: String): Response<List<PatientDTO>>?
-
-    @POST(ApiRoutes.PATIENTS)
+    @POST(ApiRoutes.PATIENT)
     suspend fun createPatient(
         @Body patient: CreatePatientDTO
     ): Response<List<PatientDTO>>?
 
-    @PUT(ApiRoutes.PATIENT_DETAIL)
+    @PATCH(ApiRoutes.PATIENT)
     suspend fun updatePatient(
-        @Path("uid") uid: String,
+        @Query("id") id: String,
         @Body patient: UpdatePatientDTO
     ): Response<List<PatientDTO>>?
 
-    @DELETE(ApiRoutes.PATIENT_DETAIL)
-    suspend fun deletePatient(@Path("uid") uid: String): Response<List<PatientDTO>>?
+    @DELETE(ApiRoutes.PATIENT)
+    suspend fun deletePatient(@Query("id") id: String): Response<List<PatientDTO>>?
 
-    // Consultations
-    @GET(ApiRoutes.CONSULTATIONS)
-    suspend fun getConsultations(): Response<List<ConsultationDTO>>?
+    @GET(ApiRoutes.CONSULTATION)
+    suspend fun getConsultations(@Query("creator_id") filter: String): Response<List<ConsultationDTO>>?
 
-    @GET(ApiRoutes.CONSULTATION_DETAIL)
-    suspend fun getConsultation(@Path("uid") uid: String): Response<List<ConsultationDTO>>?
+    @GET(ApiRoutes.CONSULTATION)
+    suspend fun getConsultation(@Query("id") uid: String): Response<List<ConsultationDTO>>?
 
-    @POST(ApiRoutes.CONSULTATIONS)
-    suspend fun createConsultation(
-        @Body consultation: CreateConsultationDTO
-    ): Response<List<ConsultationDTO>>?
-
-    @PUT(ApiRoutes.CONSULTATION_DETAIL)
+    @PUT(ApiRoutes.CONSULTATION)
     suspend fun updateConsultation(
-        @Path("uid") uid: String,
+        @Query("id") uid: String,
         @Body consultation: UpdateConsultationDTO
     ): Response<List<ConsultationDTO>>?
 
-    @DELETE(ApiRoutes.CONSULTATION_DETAIL)
-    suspend fun deleteConsultation(@Path("uid") uid: String): Response<List<ConsultationDTO>>?
+    @DELETE(ApiRoutes.CONSULTATION)
+    suspend fun deleteConsultation(@Query("id") uid: String): Response<List<ConsultationDTO>>?
 
-    // Todo (to-do list pour le thérapeute)
     @GET(ApiRoutes.TODOS)
     suspend fun getTodos(): Response<List<TodoDTO>>?
 
@@ -87,38 +76,12 @@ interface ApiService {
     @DELETE(ApiRoutes.TODO_DETAIL)
     suspend fun deleteTodo(@Path("uid") uid: String): Response<List<TodoDTO>>?
 
-    // Therapists
     @GET(ApiRoutes.THERAPIST)
-    suspend fun getTherapists(): Response<List<TherapistDTO>>?
+    suspend fun getTherapist(@Query("id") uid: String): Response<List<TherapistDTO>>?
 
-    @GET(ApiRoutes.THERAPIST_DETAIL)
-    suspend fun getTherapist(@Path("uid") uid: String): Response<List<TherapistDTO>>?
-
-    @PUT(ApiRoutes.THERAPIST_DETAIL)
+    @PATCH(ApiRoutes.THERAPIST)
     suspend fun updateTherapist(
-        @Path("uid") uid: String,
+        @Query("id") uid: String,
         @Body therapist: UpdateTherapistDTO
     ): Response<List<TherapistDTO>>?
-
-    // Categories
-    @GET(ApiRoutes.CATEGORIES)
-    suspend fun getCategories(): Response<List<CategoryDTO>>?
-
-    @GET(ApiRoutes.CATEGORY_DETAIL)
-    suspend fun getCategory(@Path("uid") uid: String): Response<List<CategoryDTO>>?
-
-    @POST(ApiRoutes.CATEGORIES)
-    suspend fun createCategory(
-        @Body category: CreateCategoryDTO
-    ): Response<List<CategoryDTO>>?
-
-    @PUT(ApiRoutes.CATEGORY_DETAIL)
-    suspend fun updateCategory(
-        @Path("uid") uid: String,
-        @Body category: UpdateCategoryDTO
-    ): Response<List<CategoryDTO>>?
-
-    @DELETE(ApiRoutes.CATEGORY_DETAIL)
-    suspend fun deleteCategory(@Path("uid") uid: String): Response<List<CategoryDTO>>?
 }
-

@@ -16,17 +16,14 @@ import com.example.therapy_flow.network.dtos.TodoDTO
 @Composable
 fun TodoScreen(
     navController: NavHostController,
-    viewModel: TodoViewModel = hiltViewModel()
+    viewModel: TodoViewModel
 ) {
-    // Collecte de la liste des tâches depuis le ViewModel
     val todos by viewModel.todoList.collectAsState()
 
-    // Lancement d'un effet pour rafraîchir la liste à l'ouverture
     LaunchedEffect(Unit) {
         viewModel.fetchTodos()
     }
 
-    // TodoScreen gère toute la logique et passe uniquement les callbacks et les états à TodoContent
     TodoContent(
         todos = todos,
         onCreateTodo = { taskName, description ->
@@ -57,7 +54,6 @@ fun TodoContent(
         .padding(16.dp)) {
         Text(text = "My Todo List", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
-        // Formulaire pour ajouter une nouvelle tâche
         OutlinedTextField(
             value = newTaskName,
             onValueChange = { newTaskName = it },

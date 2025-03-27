@@ -1,5 +1,6 @@
 package com.example.therapy_flow.userInterface.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
@@ -8,8 +9,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
@@ -21,7 +23,15 @@ fun ProfileScreen(
     navController: NavHostController,
     viewModel: ProfileViewModel
 ) {
-    val therapist by viewModel.therapistData.collectAsState()
+    val therapist by viewModel.therapistDataFlow.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.uiMessageFlow.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     ProfileContent(
         therapist = therapist,
         onUpdate = { updatedTherapist ->
@@ -35,8 +45,17 @@ fun ProfileContent(
     therapist: Therapist? = null,
     onUpdate: (Therapist) -> Unit = {}
 ) {
-    var name by remember { mutableStateOf(therapist?.name ?: "") }
+    var firstName by remember { mutableStateOf(therapist?.firstName ?: "") }
+    var lastName by remember { mutableStateOf(therapist?.lastName ?: "") }
     var email by remember { mutableStateOf(therapist?.email ?: "") }
+
+    LaunchedEffect(therapist) {
+        therapist?.let {
+            firstName = it.firstName
+            lastName = it.lastName
+            email = it.email
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -51,44 +70,48 @@ fun ProfileContent(
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Spacer(modifier = Modifier.height(100.dp))
 
-        Column {
-            MyTextField(
-                value = name,
-                onValueChange = { name = it },
-                hint = "Nom complet",
-                hintColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                leadingIcon = Icons.Outlined.Person
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            MyTextField(
-                value = email,
-                onValueChange = { email = it },
-                hint = "Email",
-                hintColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                leadingIcon = Icons.Outlined.Email
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        Spacer(modifier = Modifier.height(100.dp))
-
+        // Champ Prénom
+        MyTextField(
+            value = firstName,
+            onValueChange = { firstName = it },
+            hint = "First Name",
+            hintColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            leadingIcon = Icons.Outlined.Person
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        // Champ Nom
+        MyTextField(
+            value = lastName,
+            onValueChange = { lastName = it },
+            hint = "Last Name",
+            hintColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            leadingIcon = Icons.Outlined.Person
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        // Champ Email
+        MyTextField(
+            value = email,
+            onValueChange = { email = it },
+            hint = "Email",
+            hintColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            leadingIcon = Icons.Outlined.Email
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
                 onUpdate(
                     Therapist(
                         id = therapist?.id ?: "",
-                        name = name,
+                        firstName = firstName,
+                        lastName = lastName,
                         email = email
                     )
                 )
             },
-            modifier = Modifier
-                .wrapContentWidth()
+            modifier = Modifier.wrapContentWidth()
         ) {
-            Text(text = "Mettre à jour le profil")
+            Text(text = "Update Profile")
         }
     }
 }
@@ -99,7 +122,8 @@ fun ProfilePreview() {
     ProfileContent(
         therapist = Therapist(
             id = "1234",
-            name = "John Doe",
+            firstName = "John",
+            lastName = "Doe",
             email = "john.doe@example.com"
         )
     )

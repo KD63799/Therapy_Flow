@@ -14,7 +14,7 @@ data class PatientDTO(
     @Json(name = "email")
     val email: String,
     @Json(name = "birthdate")
-    val birthdate: String, // au format ISO (ex: "yyyy-MM-dd")
+    val birthdate: String,
     @Json(name = "phone")
     val phone: String
 )

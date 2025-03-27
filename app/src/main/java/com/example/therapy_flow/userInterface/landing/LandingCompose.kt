@@ -22,9 +22,9 @@ import com.example.therapy_flow.userInterface.patient.PatientScreen
 import com.example.therapy_flow.userInterface.patient.PatientViewModel
 import com.example.therapy_flow.userInterface.profile.ProfileScreen
 import com.example.therapy_flow.userInterface.profile.ProfileViewModel
+import com.example.therapy_flow.userInterface.schedule.ScheduleViewModel
 import com.example.therapy_flow.userInterface.todo.TodoScreen
 import com.example.therapy_flow.userInterface.todo.TodoViewModel
-import kotlinx.coroutines.flow.collect
 
 @Composable
 fun LandingScreen(
@@ -33,7 +33,6 @@ fun LandingScreen(
 ) {
     val context = LocalContext.current
 
-    // Collecte des événements de navigation (déconnexion)
     LaunchedEffect(Unit) {
         viewModel.navigateToLoginFlow.collect { navigate ->
             if (navigate) {
@@ -44,9 +43,8 @@ fun LandingScreen(
         }
     }
 
-    // Collecte et affichage du toast
     LaunchedEffect(Unit) {
-        viewModel.toastMessageFlow.collect { message ->
+        viewModel.uiMessageFlow.collect { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -54,10 +52,8 @@ fun LandingScreen(
     LandingContent(viewModel = viewModel)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LandingContent(viewModel: LandingViewModel) {
-    // Créer un NavController dédié pour la navigation du Bottom Navigation
     val bottomNavController = rememberNavController()
     Scaffold(
         topBar = {
@@ -67,19 +63,17 @@ fun LandingContent(viewModel: LandingViewModel) {
             )
         },
         bottomBar = {
-            // Réutilisation du BottomNavigationBar défini dans votre design system
             BottomNavigationBar(navController = bottomNavController)
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            // Utiliser un NavHost interne avec les routes de BottomNavScreen
             NavHost(
                 navController = bottomNavController,
                 startDestination = BottomNavScreen.Schedule.route
             ) {
                 composable(BottomNavScreen.Schedule.route) {
-                    // Appeler le contenu de l'accueil, par exemple ScheduleScreen
-                    ScheduleScreen(navController = bottomNavController)
+                    val scheduleViewModel: ScheduleViewModel = hiltViewModel()
+                    ScheduleScreen(navController = bottomNavController, scheduleViewModel)
                 }
                 composable(BottomNavScreen.Profile.route) {
                     val profileViewModel: ProfileViewModel = hiltViewModel()

@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SettingsAccessibility
 import androidx.compose.material.icons.filled.Task
 
-// Définition des routes pour le Bottom Navigation
 sealed class BottomNavScreen(val route: String) {
     data object Schedule : BottomNavScreen("schedule_screen")
     data object Profile : BottomNavScreen("profile_screen")
@@ -21,7 +20,6 @@ sealed class BottomNavScreen(val route: String) {
     data object Todo : BottomNavScreen("todo_screen")
 }
 
-// Data class pour représenter un item de navigation
 data class NavigationItem(
     val title: String,
     val icon: ImageVector,
@@ -30,7 +28,6 @@ data class NavigationItem(
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
-    // On utilise ici les routes définies dans BottomNavScreen
     val navigationItems = listOf(
         NavigationItem(
             title = "Schedule",

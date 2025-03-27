@@ -8,17 +8,15 @@ data class ConsultationDTO(
     @Json(name = "id")
     val id: String,
     @Json(name = "date_time")
-    val dateTime: String,  // ISO format (ex: "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    val dateTime: String,
     @Json(name = "status")
-    val status: String,    // 'ATTENDED', 'ABSENT_EXCUSED' ou 'ABSENT_UNEXCUSED'
+    val status: String,
     @Json(name = "description")
     val description: String?,
     @Json(name = "creator_id")
     val creatorId: String,
     @Json(name = "patient_id")
     val patientId: String,
-    @Json(name = "category_id")
-    val categoryId: String,
     @Json(name = "created_at")
     val createdAt: String,
     @Json(name = "updated_at")
@@ -37,8 +35,6 @@ data class CreateConsultationDTO(
     val creatorId: String,
     @Json(name = "patient_id")
     val patientId: String,
-    @Json(name = "category_id")
-    val categoryId: String
 )
 
 @JsonClass(generateAdapter = true)
@@ -53,7 +49,5 @@ data class UpdateConsultationDTO(
     val creatorId: String?,
     @Json(name = "patient_id")
     val patientId: String?,
-    @Json(name = "category_id")
-    val categoryId: String?
 )
 

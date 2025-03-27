@@ -1,5 +1,6 @@
 package com.example.therapy_flow.userInterface.register
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,7 +45,7 @@ fun RegisterScreen(
 
     // Collecte des messages toast via le SharedFlow du ViewModel
     LaunchedEffect(Unit) {
-        registerViewModel.toastMessageFlow.collect { message ->
+        registerViewModel.uiMessageFlow.collect { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -55,12 +56,12 @@ fun RegisterScreen(
             if (success) {
                 navController.navigate("landing") {
                     popUpTo("register") { inclusive = true }
+                    Log.e("Register", "Collecte de l'emit pour naviguer")
                 }
             }
         }
     }
 
-    // La vue se contente d'appeler la fonction sans logique de validation (celle-ci est dans le ViewModel)
     RegisterContent(
         onRegisterPressed = { email, password, confirmPassword ->
             registerViewModel.performRegister(email, password, confirmPassword)
@@ -83,11 +84,9 @@ fun RegisterContent(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    // Définition globale de la regex pour l'email
-    // (vous pouvez aussi la passer en paramètre ou la récupérer depuis le ViewModel)
+
     val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})".toRegex()
 
-    // Déterminer l'icône de fin en fonction de l'état du champ email
     val trailingIcon = when {
         emailInput.isEmpty() -> null
         emailRegex.matches(emailInput) -> Icons.Outlined.Check
@@ -130,7 +129,7 @@ fun RegisterContent(
             isPassword = false,
             leadingIcon = Icons.Outlined.Email,
             trailingIcon = trailingIcon,
-            onTrailingClick = { /* Action éventuelle */ }
+            onTrailingClick = { }
         )
 
         MyTextField(
@@ -159,11 +158,12 @@ fun RegisterContent(
 
         Button(
             onClick = { onRegisterPressed(emailInput, passwordInput, confirmPasswordInput) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.wrapContentWidth()
+
         ) {
             Text(
                 text = "Register",
-                fontSize = 17.sp,
+                fontSize = 20.sp,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         }

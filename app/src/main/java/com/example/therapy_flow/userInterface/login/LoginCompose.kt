@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.therapy_flow.R
 import com.example.therapy_flow.Screen
@@ -36,19 +35,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    loginViewModel: LoginViewModel = hiltViewModel()
+    loginViewModel: LoginViewModel
 ) {
     val localContext = LocalContext.current
 
     LaunchedEffect(Unit) {
         loginViewModel.run {
             launch {
-                messageFlow.collect { message ->
+                uiMessageFlow.collect { message ->
                     Toast.makeText(localContext, message, Toast.LENGTH_SHORT).show()
                 }
             }
             launch {
-                navigateToMain.collect { shouldNavigate ->
+                navigateToMainFlow.collect { shouldNavigate ->
                     if (shouldNavigate) {
                         navController.navigate(Screen.Landing.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
@@ -107,7 +106,6 @@ fun LoginContent(
             )
         }
 
-        // Champ Email
         MyTextField(
             value = usernameInput,
             onValueChange = { usernameInput = it },
@@ -120,7 +118,6 @@ fun LoginContent(
             onTrailingClick = { /* Action éventuelle */ }
         )
 
-        // Champ Password avec icône de visibilité
         MyTextField(
             value = passwordInput,
             onValueChange = { passwordInput = it },
@@ -133,19 +130,18 @@ fun LoginContent(
             onTrailingClick = { passwordVisible = !passwordVisible }
         )
 
-        // Bouton de connexion
         Button(
             onClick = { onLoginPressed(usernameInput, passwordInput) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.wrapContentWidth()
+
         ) {
             Text(
                 text = stringResource(id = R.string.login),
-                fontSize = 17.sp,
+                fontSize = 20.sp,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         }
 
-        // Lien vers l'inscription
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(
                 text = stringResource(id = R.string.no_account_prompt),

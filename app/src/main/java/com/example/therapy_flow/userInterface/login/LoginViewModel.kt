@@ -25,11 +25,11 @@ class LoginViewModel @Inject constructor(
     private val preferences: PreferencesManager
 ) : ViewModel() {
 
-    private val _messageFlow = MutableSharedFlow<String>()
-    val messageFlow = _messageFlow.asSharedFlow()
+    private val _uiMessageFlow = MutableSharedFlow<String>()
+    val uiMessageFlow = _uiMessageFlow.asSharedFlow()
 
-    private val _navigateToMain = MutableSharedFlow<Boolean>()
-    val navigateToMain = _navigateToMain.asSharedFlow()
+    private val _navigateToMainFlow = MutableSharedFlow<Boolean>()
+    val navigateToMainFlow = _navigateToMainFlow.asSharedFlow()
 
     fun performLogin(email: String, password: String) {
         val cleanEmail = email.trim()
@@ -37,7 +37,7 @@ class LoginViewModel @Inject constructor(
 
         if (cleanEmail.isEmpty() || cleanPassword.isEmpty()) {
             viewModelScope.launch {
-                _messageFlow.emit(appContext.getString(R.string.please_fill_in_all_fields))
+                _uiMessageFlow.emit(appContext.getString(R.string.please_fill_in_all_fields))
             }
             return
         }
@@ -48,7 +48,6 @@ class LoginViewModel @Inject constructor(
     private fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             try {
-                // Exécution de l'appel réseau sur le thread IO
                 val response = withContext(Dispatchers.IO) {
                     apiService.login(
                         grantType = "password",
@@ -59,14 +58,14 @@ class LoginViewModel @Inject constructor(
                 var messageResId: Int? = null
                 val responseBody: AuthResponseDTO? = response?.body()
                 if (response == null) {
-                    _messageFlow.emit(appContext.getString(R.string.no_response_from_server))
+                    _uiMessageFlow.emit(appContext.getString(R.string.no_response_from_server))
                 } else {
                     when (response.code()) {
                         200 -> {
                             preferences.authToken = responseBody?.token
                             preferences.currentUserId = responseBody?.user?.id
-                            _navigateToMain.emit(true)
-                            _messageFlow.emit(appContext.getString(R.string.login_successful))
+                            _navigateToMainFlow.emit(true)
+                            _uiMessageFlow.emit(appContext.getString(R.string.login_successful))
                         }
                         304 -> messageResId = R.string.internal_error
                         400 -> messageResId = R.string.user_not_found_prompt
@@ -77,12 +76,12 @@ class LoginViewModel @Inject constructor(
                 }
 
                 messageResId?.let {
-                    _messageFlow.emit(appContext.getString(it))
+                    _uiMessageFlow.emit(appContext.getString(it))
                 }
             } catch (ex: ConnectException) {
-                _messageFlow.emit(appContext.getString(R.string.connection_error))
+                _uiMessageFlow.emit(appContext.getString(R.string.connection_error))
             } catch (ex: Exception) {
-                _messageFlow.emit(appContext.getString(R.string.unexpected_error))
+                _uiMessageFlow.emit(appContext.getString(R.string.unexpected_error))
             }
         }
     }

@@ -6,11 +6,11 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class TherapistDTO(
     @Json(name = "id")
-    val id: String,  // UUID sous forme de String
+    val id: String,
     @Json(name = "first_name")
-    val firstName: String,
+    val firstName: String? = "",
     @Json(name = "last_name")
-    val lastName: String,
+    val lastName: String? = "",
     @Json(name = "email")
     val email: String
 )

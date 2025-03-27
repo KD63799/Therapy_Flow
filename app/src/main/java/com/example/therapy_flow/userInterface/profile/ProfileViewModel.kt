@@ -1,45 +1,51 @@
 package com.example.therapy_flow.userInterface.profile
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.therapy_flow.R
 import com.example.therapy_flow.network.ApiService
-import com.example.therapy_flow.network.dtos.TherapistDTO
-import com.example.therapy_flow.network.dtos.UpdateTherapistDTO
 import com.example.therapy_flow.utils.PreferencesManager
 import com.example.therapy_flow.utils.Therapist
 import com.example.therapy_flow.utils.toDomainModel
 import com.example.therapy_flow.utils.toUpdateDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val preferences: PreferencesManager,
     private val apiService: ApiService
 ) : ViewModel() {
 
-    private val _therapistData = MutableStateFlow<Therapist?>(null)
-    val therapistData: StateFlow<Therapist?> = _therapistData
+    private val _uiMessageFlow = MutableSharedFlow<String>()
+    val uiMessageFlow = _uiMessageFlow.asSharedFlow()
+
+    private val _therapistDataFlow = MutableStateFlow<Therapist?>(null)
+    val therapistDataFlow: StateFlow<Therapist?> = _therapistDataFlow
 
     init {
-        // Récupération de l'ID du thérapeute depuis les préférences
         val therapistId = preferences.currentUserId ?: ""
         if (therapistId.isNotEmpty()) {
             viewModelScope.launch {
                 try {
-                    val response = apiService.getTherapist(therapistId)
+                    val response = apiService.getTherapist("eq.$therapistId")
                     if (response?.isSuccessful == true) {
                         response.body()?.firstOrNull()?.let { therapistDTO ->
-                            _therapistData.value = therapistDTO.toDomainModel()
+                            _therapistDataFlow.value = therapistDTO.toDomainModel()
                         }
                     } else {
-                        // Gestion de l'erreur côté API
+                        _uiMessageFlow.emit("Erreur lors de la récupération du profil: code ${response?.code()}")
                     }
                 } catch (e: Exception) {
-                    // Gestion de l'exception (log, message utilisateur, etc.)
+                    _uiMessageFlow.emit("Erreur inattendue: ${e.message}")
                 }
             }
         }
@@ -48,19 +54,16 @@ class ProfileViewModel @Inject constructor(
     fun updateTherapist(updatedTherapist: Therapist) {
         viewModelScope.launch {
             try {
-                // Conversion du modèle de domaine en DTO pour la mise à jour
                 val updateDTO = updatedTherapist.toUpdateDTO()
-                val response = apiService.updateTherapist(updatedTherapist.id, updateDTO)
+                val response = apiService.updateTherapist("eq.${updatedTherapist.id}", updateDTO)
                 if (response?.isSuccessful == true) {
-                    // Mise à jour du state avec la réponse de l'API
-                    response.body()?.firstOrNull()?.let { updatedDTO ->
-                        _therapistData.value = updatedDTO.toDomainModel()
-                    }
+                    _therapistDataFlow.value = updatedTherapist
+                    _uiMessageFlow.emit(context.getString(R.string.profile_updated))
                 } else {
-                    // Gestion d'une réponse non satisfaisante
+                    _uiMessageFlow.emit("Error while updated data: code ${response?.code()}")
                 }
             } catch (e: Exception) {
-                // Gestion de l'exception
+                _uiMessageFlow.emit("Unexpected error\n ${e.message}")
             }
         }
     }

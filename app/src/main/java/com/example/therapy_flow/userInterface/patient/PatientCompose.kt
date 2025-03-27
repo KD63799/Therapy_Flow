@@ -3,17 +3,18 @@ package com.example.therapy_flow.userInterface.patient
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.GroupAdd
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.therapy_flow.R
-import com.example.therapy_flow.design_system.Patient
 import com.example.therapy_flow.design_system.PatientItem
+import com.example.therapy_flow.utils.Patient
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -34,14 +35,12 @@ fun PatientScreen(
     navController: NavHostController,
     viewModel: PatientViewModel = hiltViewModel()
 ) {
-    // Récupération de la liste des patients et de l'état du formulaire depuis le ViewModel
-    val patients by viewModel.patients.collectAsState(initial = emptyList())
+    val patients by viewModel.listPatientsFlow.collectAsState(initial = emptyList())
     val isFormExpanded by viewModel.isFormExpanded.collectAsState()
-
-    // Collecte des messages toast depuis le ViewModel
     val context = LocalContext.current
+
     LaunchedEffect(Unit) {
-        viewModel.toastMessageFlow.collectLatest { message ->
+        viewModel.uiMessageFlow.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -59,7 +58,7 @@ fun PatientScreen(
         onDeletePatient = { patientId ->
             viewModel.deletePatient(patientId)
         },
-        modifier = Modifier
+        modifier = Modifier.fillMaxSize()
     )
 }
 
@@ -73,7 +72,6 @@ fun PatientContent(
     onDeletePatient: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // États locaux pour les champs du formulaire
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -82,7 +80,6 @@ fun PatientContent(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
@@ -95,7 +92,7 @@ fun PatientContent(
         ) {
             Text(
                 text = stringResource(R.string.add_new_patient),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.width(10.dp))
             Icon(
@@ -106,13 +103,12 @@ fun PatientContent(
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
-
         AnimatedVisibility(
             visible = isFormExpanded,
-            enter = fadeIn(animationSpec = tween(durationMillis = 400)) +
-                    expandVertically(animationSpec = tween(durationMillis = 400)),
-            exit = fadeOut(animationSpec = tween(durationMillis = 200)) +
-                    slideOutVertically(animationSpec = tween(durationMillis = 250))
+            enter = androidx.compose.animation.fadeIn(animationSpec = tween(durationMillis = 400)) +
+                    androidx.compose.animation.expandVertically(animationSpec = tween(durationMillis = 400)),
+            exit = androidx.compose.animation.fadeOut(animationSpec = tween(durationMillis = 200)) +
+                    androidx.compose.animation.slideOutVertically(animationSpec = tween(durationMillis = 250))
         ) {
             Column {
                 OutlinedTextField(
@@ -153,24 +149,20 @@ fun PatientContent(
                 Button(
                     onClick = {
                         onAddPatient(firstName, lastName, email, birthdate, phone)
-                        // Réinitialisation des champs après ajout
                         firstName = ""
                         lastName = ""
                         email = ""
                         birthdate = ""
                         phone = ""
                     },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .wrapContentWidth()
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text("Add Patient", fontSize = 16.sp)
                 }
-                Spacer(modifier = Modifier.height(16.dp))
                 Divider()
             }
         }
-
+        Spacer(modifier = Modifier.height(16.dp))
         Spacer(modifier = Modifier.height(16.dp))
         Text("Patient List", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
@@ -190,7 +182,7 @@ fun PatientContent(
 @Preview(showBackground = true)
 @Composable
 fun PatientContentPreview() {
-    // Exemple de liste de patients pour la preview
+    // Exemple pour la preview
     val samplePatients = listOf(
         Patient("1", "John", "Doe", "john@example.com", "1990-01-01", "1234567890"),
         Patient("2", "Jane", "Doe", "jane@example.com", "1992-02-02", "0987654321")
@@ -202,6 +194,6 @@ fun PatientContentPreview() {
         onAddPatient = { _, _, _, _, _ -> },
         onEditPatient = {},
         onDeletePatient = {},
-        modifier = Modifier
+        modifier = Modifier.fillMaxSize()
     )
 }
